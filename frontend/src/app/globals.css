@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+
+:root {
+  --radius: 0.625rem;
+  --background: #F5F5F5;
+  --foreground: #091413;
+  --card: #FFFFFF;
+  --card-foreground: #091413;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --primary: #428475;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A312C;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #428475;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --success: #4CAF50;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  --ring: #428475;
+  --sidebar-width: 256px;
+  --header-height: 64px;
+}
+
+.dark {
+  --background: #091413;
+  --foreground: #F5F5F5;
+  --card: #0F1F1D;
+  --card-foreground: #F5F5F5;
+  --border: #1E3530;
+  --input: #1E3530;
+  --primary: #428475;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A312C;
+  --secondary-foreground: #F5F5F5;
+  --muted: #1A312C;
+  --muted-foreground: #94A3B8;
+  --accent: #428475;
+  --accent-foreground: #FFFFFF;
+  --ring: #428475;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-geist-sans), Inter, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+
+::selection { background: #42847530; color: var(--foreground); }
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(15, 31, 29, 0.6);
+  border: 1px solid rgba(66, 132, 117, 0.15);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #428475 0%, #1A312C 100%);
+}
+
+.gradient-xp {
+  background: linear-gradient(90deg, #428475 0%, #FFD700 100%);
+}
