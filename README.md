@@ -39,7 +39,6 @@ The platform runs an AI suggestion engine (Maya) that reads your data — missed
 ## System Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '15px', 'fontFamily': 'monospace'}}}%%
 flowchart LR
     subgraph Clients["  Clients  "]
         direction TB
@@ -111,7 +110,6 @@ flowchart LR
 ## Request & Event Flow
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
 sequenceDiagram
     actor User
     participant FE   as Frontend :3000

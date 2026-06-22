@@ -38,7 +38,6 @@
 ### Request Pipeline
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px', 'fontFamily': 'monospace'}}}%%
 flowchart LR
     REQ(["Incoming\nHTTP Request"])
 
@@ -75,7 +74,6 @@ flowchart LR
 ### Module Dependency Graph
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
 flowchart TD
     subgraph Root["AppModule"]
         direction LR
@@ -118,7 +116,6 @@ flowchart TD
 ### Event-Driven Gamification & ML Flow
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
 sequenceDiagram
     participant Handler  as Route Handler
     participant EE       as EventEmitter2
@@ -150,7 +147,6 @@ sequenceDiagram
 ### Queue Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
 flowchart LR
     subgraph Producers["Producers"]
         direction TB
@@ -193,7 +189,6 @@ flowchart LR
 ### ML Gateway — Circuit Breaker Pattern
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
 stateDiagram-v2
     [*]    --> Closed   : service starts
     Closed --> Closed   : request succeeds\nfailures--
