@@ -1,0 +1,39 @@
+# Core API
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+websockets==13.1
+python-multipart==0.0.12
+
+# Speech-to-Text
+faster-whisper==1.1.1
+
+# Voice Activity Detection (Silero VAD via ONNX)
+onnxruntime==1.20.1
+silero-vad==5.1.2
+
+# Text-to-Speech
+piper-tts==1.2.0
+
+# Wake Word (OpenWakeWord — offline, ONNX inference)
+openwakeword==0.6.0
+
+# Intent classification
+scikit-learn==1.5.2
+numpy==1.26.4
+
+# Async HTTP (to call ml/maya/ and NestJS)
+httpx==0.27.2
+
+# Redis (session memory)
+redis==5.1.1
+
+# Calendar
+google-api-python-client==2.154.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.1
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0

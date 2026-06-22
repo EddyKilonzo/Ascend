@@ -10,9 +10,13 @@ import { authConfig } from './config/auth.config';
 import { databaseConfig } from './config/database.config';
 import { cloudinaryConfig } from './config/cloudinary.config';
 import { mailConfig } from './config/mail.config';
+import { mlConfig } from './config/ml.config';
 
-import { DatabaseModule } from './database/database.module';
-import { EmailModule } from './integrations/email/email.module';
+import { DatabaseModule }  from './database/database.module';
+import { EmailModule }     from './integrations/email/email.module';
+import { AiGatewayModule } from './integrations/ai-gateway/ai-gateway.module';
+import { QueuesModule }    from './queues/queues.module';
+import { JobsModule }      from './jobs/jobs.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { HabitsModule } from './modules/habits/habits.module';
@@ -42,7 +46,7 @@ import { AdminModule } from './modules/admin/admin.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, authConfig, databaseConfig, cloudinaryConfig, mailConfig],
+      load: [appConfig, authConfig, databaseConfig, cloudinaryConfig, mailConfig, mlConfig],
       envFilePath: ['.env.local', '.env'],
       cache: true,
     }),
@@ -56,11 +60,24 @@ import { AdminModule } from './modules/admin/admin.module';
       ],
     }),
 
-    // In-memory cache — swap for Redis store when Redis is available in production
-    CacheModule.register({
+    // Redis-backed cache (falls back to in-memory if REDIS_URL unset)
+    CacheModule.registerAsync({
       isGlobal: true,
-      ttl:   300_000,  // 5 minutes in ms
-      max:   500,      // max 500 cached items
+      imports:    [ConfigModule],
+      inject:     [ConfigService],
+      useFactory: async (cfg: ConfigService) => {
+        const redisUrl = cfg.get<string>('REDIS_URL');
+        if (redisUrl) {
+          // Dynamically load redis store so missing dep doesn't crash dev
+          try {
+            const { default: redisStore } = await import('cache-manager-ioredis-yet');
+            return { store: redisStore, url: redisUrl, ttl: 300, max: 10_000 };
+          } catch {
+            // cache-manager-ioredis-yet not installed — fall through to in-memory
+          }
+        }
+        return { ttl: 300_000, max: 500 };
+      },
     }),
 
     ScheduleModule.forRoot(),
@@ -68,6 +85,9 @@ import { AdminModule } from './modules/admin/admin.module';
 
     DatabaseModule,
     EmailModule,
+    AiGatewayModule,
+    QueuesModule,
+    JobsModule,
     AuthModule,
     UsersModule,
     HabitsModule,
