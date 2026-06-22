@@ -8,27 +8,27 @@
 
 | | Category | Technology | Notes |
 | --- | --- | --- | --- |
-| 🔴 | **Framework** | NestJS 11 | Feature-based module architecture |
-| 🔷 | **Language** | TypeScript 5.7 | Strict mode, `esModuleInterop` |
-| 🟢 | **Runtime** | Node.js ≥ 20 | |
-| ◼️ | **ORM** | Prisma v6 | PostgreSQL, full-text search |
-| 🐘 | **Database** | PostgreSQL on Neon | Serverless, connection pooler |
-| 🔐 | **Auth** | Passport.js + JWT | Access (15m) + refresh (7d) token rotation |
-| 🌐 | **OAuth** | Google + GitHub | Passport OAuth2 strategies |
-| 🔑 | **2FA** | Speakeasy + QRCode | TOTP via authenticator apps |
-| 🔒 | **Hashing** | bcryptjs | Passwords cost 12 · SHA-256 for refresh tokens |
-| ☁️ | **File Uploads** | Cloudinary + Multer | Avatar, goal images, habit evidence, general files |
-| 📧 | **Email** | Nodemailer + Brevo | Verification, password reset, welcome templates |
-| 🚦 | **Rate Limiting** | `@nestjs/throttler` | Short / medium / long tier throttling |
-| ⚡ | **Caching** | `@nestjs/cache-manager` | In-memory (Redis-swappable) |
-| 📡 | **Events** | `@nestjs/event-emitter` | XP, achievements, notifications |
-| ⏰ | **Scheduling** | `@nestjs/schedule` | Cron-ready for background jobs |
-| ✅ | **Validation** | class-validator + class-transformer | Global `ValidationPipe` |
-| 📖 | **API Docs** | Swagger / OpenAPI | Auto-generated at `/api/docs` |
-| 📝 | **Logging** | Winston + nest-winston | Structured JSON logs |
-| 🏥 | **Health** | `@nestjs/terminus` | DB + memory heap checks |
-| 🛡️ | **Security** | Helmet · CORS · cookie-parser | Production hardening |
-| 📅 | **Dates** | dayjs | ISO week, timezone-aware calculations |
+| ![](./../.github/assets/nestjs.svg) | **Framework** | NestJS 11 | Feature-based module architecture |
+| ![](./../.github/assets/typescript.svg) | **Language** | TypeScript 5.7 | Strict mode, `esModuleInterop` |
+| ![](./../.github/assets/nodejs.svg) | **Runtime** | Node.js ≥ 20 | |
+| ![](./../.github/assets/prisma.svg) | **ORM** | Prisma v6 | PostgreSQL, full-text search |
+| ![](./../.github/assets/postgresql.svg) ![](./../.github/assets/neon.svg) | **Database** | PostgreSQL on Neon | Serverless, connection pooler |
+| ![](./../.github/assets/passport.svg) ![](./../.github/assets/jwt.svg) | **Auth** | Passport.js + JWT | Access (15m) + refresh (7d) token rotation |
+| | **OAuth** | Google + GitHub | Passport OAuth2 strategies |
+| | **2FA** | Speakeasy + QRCode | TOTP via authenticator apps |
+| | **Hashing** | bcryptjs | Passwords cost 12 · SHA-256 for refresh tokens |
+| ![](./../.github/assets/cloudinary.svg) | **File Uploads** | Cloudinary + Multer | Avatar, goal images, habit evidence |
+| ![](./../.github/assets/brevo.svg) | **Email** | Nodemailer + Brevo | Verification, password reset, welcome templates |
+| ![](./../.github/assets/swagger.svg) | **API Docs** | Swagger / OpenAPI | Auto-generated at `/api/docs` |
+| | **Rate Limiting** | `@nestjs/throttler` | Short / medium / long tier throttling |
+| | **Caching** | `@nestjs/cache-manager` | In-memory, Redis-swappable |
+| | **Events** | `@nestjs/event-emitter` | XP, achievements, notifications |
+| | **Scheduling** | `@nestjs/schedule` | Cron-ready for background jobs |
+| | **Validation** | class-validator + class-transformer | Global `ValidationPipe` |
+| | **Logging** | Winston + nest-winston | Structured JSON logs |
+| | **Health** | `@nestjs/terminus` | DB + memory heap checks |
+| | **Security** | Helmet · CORS · cookie-parser | Production hardening |
+| | **Dates** | dayjs | ISO week, timezone-aware calculations |
 
 ---
 
@@ -64,17 +64,17 @@
 
 ## Security
 
-| | Feature | Implementation |
-| --- | --- | --- |
-| 🔒 | Password hashing | bcryptjs, cost factor 12 |
-| 🪙 | Refresh token storage | SHA-256 hash in `sessions` table — raw token never persisted |
-| 🔄 | Token reuse detection | Hash mismatch → all user sessions immediately revoked |
-| 🚫 | Brute-force protection | 10 failed logins → 15-min lockout (`failedLoginAttempts`, `lockUntil`) |
-| 👮 | RBAC | `RolesGuard` + `PermissionsGuard` — in-process map, zero DB hits per request |
-| 🚦 | Rate limiting | Short 10/s · medium 30/10s · long 100/min |
-| ✅ | Input validation | `whitelist: true`, `forbidNonWhitelisted: true` on every route |
-| 🔗 | OAuth redirect | URL fragment (`#token=`) — never logged by proxy servers |
-| 🛡️ | HTTP hardening | Helmet headers, CORS, secure cookie options |
+| Feature | Implementation |
+| --- | --- |
+| Password hashing | bcryptjs, cost factor 12 |
+| Refresh token storage | SHA-256 hash in `sessions` table — raw token never persisted |
+| Token reuse detection | Hash mismatch → all user sessions immediately revoked |
+| Brute-force protection | 10 failed logins → 15-min lockout (`failedLoginAttempts`, `lockUntil`) |
+| RBAC | `RolesGuard` + `PermissionsGuard` — in-process map, zero DB hits per request |
+| Rate limiting | Short 10/s · medium 30/10s · long 100/min |
+| Input validation | `whitelist: true`, `forbidNonWhitelisted: true` on every route |
+| OAuth redirect | URL fragment (`#token=`) — never logged by proxy servers |
+| HTTP hardening | Helmet headers, CORS, secure cookie options |
 
 ---
 

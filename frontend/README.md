@@ -8,24 +8,24 @@
 
 | | Category | Technology | Notes |
 | --- | --- | --- | --- |
-| ▲ | **Framework** | Next.js 15 | App Router, server + client components |
-| 🔷 | **Language** | TypeScript 5.8 | Strict mode |
-| ⚛️ | **UI Library** | React 19 | Concurrent features, `use()` hook |
-| 💨 | **Styling** | Tailwind CSS v4 | JIT, PostCSS, CSS variables |
-| 🎯 | **Components** | Radix UI | 15 headless primitives — Dialog, Dropdown, Toast, Slider… |
-| 🎬 | **Animations** | Framer Motion 12 | Page transitions, micro-interactions |
-| 🔲 | **Icons** | Lucide React | 500+ consistent SVG icons |
-| 🐻 | **Global State** | Zustand 5 | Lightweight store |
-| 🔄 | **Server State** | TanStack Query v5 | Caching, background refetch, optimistic updates |
-| 📋 | **Forms** | React Hook Form 7 + Zod | Schema validation, type-safe |
-| 📡 | **HTTP Client** | Axios | Interceptors for silent token refresh |
-| 📈 | **Charts** | Recharts 2 | Analytics dashboards, habit heatmaps |
-| 🖱️ | **Drag & Drop** | @hello-pangea/dnd | Kanban tasks, habit reordering |
-| 📅 | **Dates** | dayjs | Lightweight, same API as moment |
-| 🌙 | **Themes** | next-themes | Dark / light / system |
-| 🔔 | **Toasts** | Sonner | Notification system |
-| 🅰️ | **Typography** | Geist (Vercel) | Clean, modern sans-serif |
-| 🎭 | **Testing** | Playwright | End-to-end browser tests |
+| ![](./../.github/assets/nextjs.svg) | **Framework** | Next.js 15 | App Router, server + client components |
+| ![](./../.github/assets/typescript.svg) | **Language** | TypeScript 5.8 | Strict mode |
+| ![](./../.github/assets/react.svg) | **UI Library** | React 19 | Concurrent features, `use()` hook |
+| ![](./../.github/assets/tailwind.svg) | **Styling** | Tailwind CSS v4 | JIT, PostCSS, CSS variables |
+| ![](./../.github/assets/radix.svg) | **Components** | Radix UI | 15 headless primitives — Dialog, Dropdown, Toast, Slider |
+| ![](./../.github/assets/framer.svg) | **Animations** | Framer Motion 12 | Page transitions, micro-interactions |
+| | **Icons** | Lucide React | 500+ consistent SVG icons |
+| ![](./../.github/assets/zustand.svg) | **Global State** | Zustand 5 | Lightweight store |
+| ![](./../.github/assets/tanstack.svg) | **Server State** | TanStack Query v5 | Caching, background refetch, optimistic updates |
+| ![](./../.github/assets/zod.svg) | **Forms** | React Hook Form 7 + Zod | Schema validation, type-safe |
+| | **HTTP Client** | Axios | Interceptors for silent token refresh |
+| | **Charts** | Recharts 2 | Analytics dashboards, habit heatmaps |
+| | **Drag & Drop** | @hello-pangea/dnd | Kanban tasks, habit reordering |
+| | **Dates** | dayjs | Lightweight, same API as moment |
+| | **Themes** | next-themes | Dark / light / system |
+| | **Toasts** | Sonner | Notification system |
+| | **Typography** | Geist (Vercel) | Clean, modern sans-serif |
+| ![](./../.github/assets/playwright.svg) | **Testing** | Playwright | End-to-end browser tests |
 
 ---
 
