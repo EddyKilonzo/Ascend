@@ -20,13 +20,14 @@
 | ![](./../.github/assets/cloudinary.svg) | **File Uploads** | Cloudinary + Multer | Avatar, goal images, habit evidence |
 | ![](./../.github/assets/brevo.svg) | **Email** | Nodemailer + Brevo | Verification, password reset, welcome templates |
 | ![](./../.github/assets/swagger.svg) | **API Docs** | Swagger / OpenAPI | Auto-generated at `/api/docs` |
+| | **Queues** | BullMQ + `@nestjs/bull` | 4 queues — ml-events, analytics, ocr, notifications |
 | | **Rate Limiting** | `@nestjs/throttler` | Short / medium / long tier throttling |
-| | **Caching** | `@nestjs/cache-manager` | In-memory, Redis-swappable |
-| | **Events** | `@nestjs/event-emitter` | XP, achievements, notifications |
-| | **Scheduling** | `@nestjs/schedule` | Cron-ready for background jobs |
+| | **Caching** | `@nestjs/cache-manager` + Redis | Redis-backed in production, in-memory fallback |
+| | **Events** | `@nestjs/event-emitter` | XP, achievements, ML ingestion, notifications |
+| | **Scheduling** | `@nestjs/schedule` | Cron jobs — daily rollup, streak alerts, leaderboard |
 | | **Validation** | class-validator + class-transformer | Global `ValidationPipe` |
 | | **Logging** | Winston + nest-winston | Structured JSON logs |
-| | **Health** | `@nestjs/terminus` | DB + memory heap checks |
+| | **Health** | `@nestjs/terminus` | DB + memory heap + ML service ping checks |
 | | **Security** | Helmet · CORS · cookie-parser | Production hardening |
 | | **Dates** | dayjs | ISO week, timezone-aware calculations |
 
@@ -37,131 +38,181 @@
 ### Request Pipeline
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px', 'fontFamily': 'monospace'}}}%%
 flowchart LR
-    Req["HTTP Request"] --> Helmet
-    Helmet --> CORS
-    CORS --> RI["RequestID\nMiddleware"]
-    RI --> Throttler
-    Throttler --> JWT["JwtAuthGuard"]
-    JWT --> Roles["RolesGuard\n+ PermissionsGuard"]
-    Roles --> Val["ValidationPipe\nclass-validator"]
-    Val --> Handler["Route Handler"]
-    Handler --> TI["TransformInterceptor\n{ data, statusCode, timestamp }"]
-    TI --> Res["HTTP Response"]
-    Handler -- throws --> GEF["GlobalExceptionFilter\nno stack trace leakage"]
-    GEF --> Res
+    REQ(["Incoming\nHTTP Request"])
+
+    subgraph Middleware["Middleware Layer"]
+        direction LR
+        HLM["Helmet\nsecurity headers"]
+        COR["CORS\norigin check"]
+        RID["RequestID Middleware\nX-Request-ID header\nfor log correlation"]
+    end
+
+    subgraph Guards["Guard Layer"]
+        direction LR
+        THR["ThrottlerGuard\nshort 10/s · med 30/10s\nlong 100/min"]
+        JWT["JwtAuthGuard\nverify access token"]
+        ROL["RolesGuard +\nPermissionsGuard\nRBAC — zero DB hits"]
+    end
+
+    subgraph Processing["Processing Layer"]
+        direction LR
+        VAL["ValidationPipe\nclass-validator\nwhitelist · forbidNonWhitelisted"]
+        HND["Route Handler\n@Controller + @Service"]
+        TRF["TransformInterceptor\n{ data, statusCode, timestamp }"]
+    end
+
+    ERR["GlobalExceptionFilter\nstructured error — no stack trace"]
+    RES(["HTTP Response"])
+
+    REQ --> HLM --> COR --> RID --> THR --> JWT --> ROL --> VAL --> HND --> TRF --> RES
+    HND -- throws --> ERR --> RES
 ```
+
+---
 
 ### Module Dependency Graph
 
 ```mermaid
-graph TD
-    App["AppModule"] --> Auth & Users & Habits & Goals & Focus & Planner & Calendar
-    App --> XP & Levels & Skills & Achievements & Badges & Leaderboard
-    App --> Analytics & Notifications & Accountability & SocialTracker
-    App --> Maya & Uploads & AuditLogs & Health & Admin
-    App --> AiGateway["AiGatewayModule\n@Global"]
-    App --> Queues["QueuesModule\nBullMQ · 4 queues"]
-    App --> Jobs["JobsModule\n3 cron schedulers"]
-    App --> DB["DatabaseModule\n@Global · PrismaService"]
-    App --> Email["EmailModule\nBrevo SMTP"]
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
+flowchart TD
+    subgraph Root["AppModule"]
+        direction LR
+        DB["DatabaseModule\n@Global · PrismaService"]
+        EM["EmailModule\nBrevo SMTP"]
+        AGW["AiGatewayModule\n@Global · circuit breaker · retry"]
+        QM["QueuesModule\nBullMQ · Redis DB:4\n4 queues · 5 processors"]
+        JM["JobsModule\n3 cron schedulers\ndaily · streaks · leaderboard"]
+        CM["CacheModule\n@Global · Redis-backed"]
+        EVT["EventEmitterModule\nwildcard · maxListeners:20"]
+        SCH["ScheduleModule"]
+    end
 
-    Habits --> HabitLogs["HabitLogsModule"]
-    Goals  --> GoalProgress["GoalProgressModule"]
+    subgraph Domain["Domain Modules (22)"]
+        direction LR
+        Auth["AuthModule\nJWT · OAuth · 2FA · lockout"]
+        Users["UsersModule"]
+        Habits["HabitsModule + HabitLogsModule"]
+        Goals["GoalsModule + GoalProgressModule"]
+        Focus["FocusModule\nPomodoro · DeepWork · UltraFocus"]
+        Gamification["XpModule · LevelsModule · SkillsModule\nAchievementsModule · BadgesModule"]
+        Social["LeaderboardModule · AccountabilityModule\nSocialTrackerModule"]
+        Content["PlannerModule · CalendarModule"]
+        Platform["AnalyticsModule · NotificationsModule\nUploadsModule · MayaModule"]
+        Infra["HealthModule · AdminModule · AuditLogsModule"]
+    end
 
-    Queues --> AiGateway
-    Maya   --> AiGateway
-    Maya   --> Queues
-
-    HabitLogs --> DB
-    Habits    --> DB
-    Goals     --> DB
-    Focus     --> DB
-    Analytics --> DB
+    Root --> Domain
+    QM --> AGW
+    QM --> DB
+    JM --> QM
+    JM --> DB
+    Platform --> AGW
+    Platform --> QM
+    Domain --> DB
 ```
 
-### Event-Driven Gamification Flow
+---
+
+### Event-Driven Gamification & ML Flow
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
 sequenceDiagram
-    participant M as Feature Module
-    participant EE as EventEmitter2
-    participant XP as XpModule
-    participant LV as LevelsModule
-    participant AC as AchievementsModule
-    participant NQ as NotificationsQueue
-    participant ML as MlEventsListener
+    participant Handler  as Route Handler
+    participant EE       as EventEmitter2
+    participant XP       as XpModule
+    participant Ach      as AchievementsModule
+    participant Notif    as NotificationsQueue
+    participant Listener as MlEventsListener
+    participant MLQueue  as BullMQ ml-events
+    participant AnalQ    as BullMQ analytics
+    participant MLSvc    as ai-platform :5001
 
-    M->>EE: emit('habit.completed', payload)
-    EE->>XP: onHabitCompleted → award XP
-    XP->>DB: atomic upsert XP + level check
+    Handler->>EE: emit('habit.completed', { userId, habitId, xpEarned, streak })
+    EE->>XP: onHabitCompleted — award XP atomically
     XP->>EE: emit('xp.awarded', { newTotalXp })
-    EE->>LV: checkLevelUp → emit('xp.level_up')
-    EE->>AC: checkUnlocks → emit('achievement.unlocked')
-    EE->>NQ: push notification job
-    EE->>ML: enqueue ml-events + analytics jobs
+    EE->>XP: onXpAwarded — check level threshold
+    XP->>EE: emit('xp.level_up', { newLevel })
+    EE->>Ach: checkUnlocks — scan all achievement conditions
+    Ach->>EE: emit('achievement.unlocked')
+    EE->>Notif: push notification job (queue)
+    EE->>Listener: onHabitCompleted
+    Listener->>MLQueue: add ingest-feature job
+    Listener->>AnalQ: add compute-daily + refresh-snapshot jobs
+    Note over MLQueue,MLSvc: async — never blocks the HTTP response
+    MLQueue->>MLSvc: POST /ingest-event (anti-poison filtered)
 ```
+
+---
 
 ### Queue Architecture
 
 ```mermaid
-graph LR
-    subgraph Triggers
-        Events["Domain Events\n@OnEvent handlers"]
-        API["API Routes\ndirect enqueue"]
-        Cron["Cron Jobs\n@Cron decorators"]
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
+flowchart LR
+    subgraph Producers["Producers"]
+        direction TB
+        EL["MlEventsListener\n@OnEvent — 15+ domain events"]
+        AJ["AnalyticsJob\ncron 00:05 daily · */5 * * * *"]
+        SJ["StreakJob\ncron 20:00 · 00:02 daily"]
+        LJ["LeaderboardJob\ncron */15 6-23 * * *"]
+        UP["UploadsService\npost-upload trigger"]
     end
 
-    subgraph Redis["Redis  DB:4"]
-        Q1["ml-events\n3 retries · exp backoff"]
-        Q2["analytics\n3 retries · exp backoff"]
-        Q3["ocr\n2 retries · 5s fixed"]
-        Q4["notifications\n5 retries · exp backoff"]
+    subgraph Redis["Redis  DB:4  —  BullMQ"]
+        direction TB
+        Q1["ml-events\nattempts:3 · exp backoff 2s\nremoveOnComplete:100"]
+        Q2["analytics\nattempts:3 · exp backoff 1s\nremoveOnComplete:100"]
+        Q3["ocr\nattempts:2 · fixed delay 5s\nremoveOnComplete:50"]
+        Q4["notifications\nattempts:5 · exp backoff 1s\nremoveOnComplete:200"]
     end
 
-    subgraph Processors
-        P1["MlEventsProcessor\ningest-feature · anticheat-check"]
-        P2["AnalyticsProcessor\ncompute-daily · refresh-snapshot"]
-        P3["OcrProcessor\nocr-process"]
-        P4["NotificationsProcessor\npush-notification"]
+    subgraph Workers["Processors  (NestJS workers)"]
+        direction TB
+        P1["MlEventsProcessor\ningest-feature → ai-platform :5001\nanticheat-check → ai-engine :5000"]
+        P2["AnalyticsProcessor\ncompute-daily → upsert AnalyticsDaily\nrefresh-snapshot → upsert Dashboard"]
+        P3["OcrProcessor\nocr-process → vision :5004\nemit ocr.intelligence_ready"]
+        P4["NotificationsProcessor\npush-notification → DB insert\nemit notification.created (WS)"]
     end
 
-    Events --> Q1 & Q2 & Q3 & Q4
-    API --> Q3
-    Cron --> Q2 & Q4
+    EL --> Q1 & Q2
+    AJ --> Q2
+    SJ --> Q4
+    LJ -.->|SQL UPDATE direct| DB2[("PostgreSQL")]
+    UP --> Q3
     Q1 --> P1
     Q2 --> P2
     Q3 --> P3
     Q4 --> P4
-    P1 -->|HTTP x-api-key| MLPlatform["ai-platform :5001"]
-    P2 -->|HTTP x-api-key| AIEngine["ai-engine :5000"]
-    P3 -->|HTTP x-api-key| Vision["vision :5004"]
 ```
 
-### ML Gateway Integration
+---
+
+### ML Gateway — Circuit Breaker Pattern
 
 ```mermaid
-graph TB
-    subgraph NestJS
-        GW["AiGatewayService\n@Global singleton"]
-        CB["CircuitBreaker\n5 failures → 30s open"]
-        Retry["Retry Logic\n2 attempts · 200ms/400ms backoff"]
-    end
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
+stateDiagram-v2
+    [*]    --> Closed   : service starts
+    Closed --> Closed   : request succeeds\nfailures--
+    Closed --> Open     : 5 consecutive failures\nopenUntil = now + 30s
+    Open   --> HalfOpen : 30 seconds elapsed
+    HalfOpen --> Closed  : probe request succeeds\nfailures = floor(threshold/2)
+    HalfOpen --> Open    : probe request fails\nopenUntil = now + 30s
 
-    subgraph Services
-        AI["ai-engine :5000\naxios instance + x-api-key"]
-        AP["ai-platform :5001\naxios instance + x-api-key"]
-        MY["maya :5002\naxios instance + x-api-key"]
-        OC["vision :5004\naxios instance + x-api-key"]
-    end
+    note right of Open
+        Returns GatewayResult { ok: false }
+        immediately — no HTTP call made.
+        Caller can use rule-based fallback.
+    end note
 
-    GW --> CB --> Retry
-    Retry --> AI & AP & MY & OC
-
-    AI -->|GatewayResult<T>\nok·data·latency_ms| GW
-    AP --> GW
-    MY --> GW
-    OC --> GW
+    note right of Closed
+        2 retries with 200ms / 400ms
+        exponential backoff before
+        a failure is recorded.
+    end note
 ```
 
 ---
@@ -188,11 +239,11 @@ graph TB
 | **notifications** | GET · unread-count · mark-read · mark-all-read · DELETE | Event-driven push notifications |
 | **social-tracker** | POST · GET · DELETE | Daily social media usage logs by platform |
 | **accountability** | create · list · complete · fail | Commitments with XP stakes |
-| **uploads** | avatar · goal image · habit evidence · general file · list · DELETE | Cloudinary uploads, metadata stored in DB |
+| **uploads** | avatar · goal image · habit evidence · general file · list · DELETE | Cloudinary uploads, auto-enqueue OCR for images/PDFs |
 | **calendar** | CRUD events · date range query | Calendar with all-day and timed events |
-| **maya** | GET `/maya/suggestions` · POST `/maya/chat` | AI coaching — Claude Opus 4.8 via ml/maya, data-backed context, rule-based fallback |
+| **maya** | GET `/maya/suggestions` · POST `/maya/chat` | AI coaching — full DB context assembled in NestJS, calls ml/maya, rule-based fallback |
 | **admin** | list users · set role · set active · platform stats | RBAC user management |
-| **health** | GET `/health` | DB + memory heap checks |
+| **health** | GET `/health` | DB + memory heap + all 4 ML service ping checks |
 
 ---
 
@@ -209,6 +260,7 @@ graph TB
 | Input validation | `whitelist: true`, `forbidNonWhitelisted: true` on every route |
 | OAuth redirect | URL fragment (`#token=`) — never logged by proxy servers |
 | HTTP hardening | Helmet headers, CORS, secure cookie options |
+| ML inter-service auth | `x-api-key` header on every ML call; validated by each Python service |
 
 ---
 
@@ -315,10 +367,10 @@ pnpm build && pnpm start
 | `REDIS_PORT` | Redis port | `6379` |
 | `REDIS_QUEUE_DB` | Redis DB index for BullMQ queues | `4` |
 | `REDIS_URL` | Full Redis URL — enables Redis HTTP cache | `redis://localhost:6379/0` |
-| `ML_API_KEY` | Shared API key for NestJS ↔ ML services | strong random string |
-| `AI_ENGINE_URL` | ai-engine base URL | `http://localhost:5000` |
-| `AI_PLATFORM_URL` | ai-platform base URL | `http://localhost:5001` |
+| `ML_API_KEY` | Shared secret for NestJS ↔ ML inter-service auth | strong random string |
+| `AI_ENGINE_URL` | ai-engine service base URL | `http://localhost:5000` |
+| `AI_PLATFORM_URL` | ai-platform service base URL | `http://localhost:5001` |
 | `MAYA_URL` | maya service base URL | `http://localhost:5002` |
 | `MAYA_VOICE_URL` | maya-voice base URL | `http://localhost:5003` |
-| `OCR_URL` | vision/OCR base URL | `http://localhost:5004` |
-| `ML_TIMEOUT_MS` | HTTP timeout for ML service calls | `8000` |
+| `OCR_URL` | vision/OCR service base URL | `http://localhost:5004` |
+| `ML_TIMEOUT_MS` | HTTP timeout for all ML calls | `8000` |
