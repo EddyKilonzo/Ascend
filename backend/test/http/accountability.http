@@ -1,0 +1,44 @@
+### Ascend API — Accountability / Commitments
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+
+### Create a new commitment
+POST {{baseUrl}}/accountability/commitments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "No social media for 7 days",
+  "description": "I commit to staying off all social media platforms this week",
+  "dueAt": "2025-07-01T23:59:59Z",
+  "xpStake": 50
+}
+
+###
+
+### Get my commitments (all statuses)
+GET {{baseUrl}}/accountability/commitments?page=1&limit=20
+Authorization: Bearer {{token}}
+
+###
+
+### Get only PENDING commitments
+GET {{baseUrl}}/accountability/commitments?status=PENDING
+Authorization: Bearer {{token}}
+
+###
+
+### Mark commitment as completed
+PATCH {{baseUrl}}/accountability/commitments/COMMITMENT_UUID/complete
+Authorization: Bearer {{token}}
+
+###
+
+### Mark commitment as failed
+PATCH {{baseUrl}}/accountability/commitments/COMMITMENT_UUID/fail
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "failureNote": "Slipped up on day 3 — will try again next week"
+}

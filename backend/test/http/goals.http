@@ -1,0 +1,72 @@
+# ─── Ascend API — Goals Endpoints ────────────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+@token = REPLACE_WITH_ACCESS_TOKEN
+@goalId = REPLACE_WITH_GOAL_ID
+
+### Create a long-term goal
+POST {{baseUrl}}/goals
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Become a SOC Analyst",
+  "description": "Complete Security+ and CEH certifications, then land a security role",
+  "timeframe": "LONG_TERM",
+  "targetDate": "2025-12-31T00:00:00.000Z",
+  "color": "#428475",
+  "icon": "shield"
+}
+
+### Create a short-term goal
+POST {{baseUrl}}/goals
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Read 3 books this month",
+  "timeframe": "SHORT_TERM",
+  "targetDate": "2025-01-31T00:00:00.000Z",
+  "color": "#1A312C"
+}
+
+### Get all goals
+GET {{baseUrl}}/goals
+Authorization: Bearer {{token}}
+
+### Get active goals only
+GET {{baseUrl}}/goals?status=ACTIVE
+Authorization: Bearer {{token}}
+
+### Get completed goals
+GET {{baseUrl}}/goals?status=COMPLETED
+Authorization: Bearer {{token}}
+
+### Get goal detail
+GET {{baseUrl}}/goals/{{goalId}}
+Authorization: Bearer {{token}}
+
+### Update goal progress
+PATCH {{baseUrl}}/goals/{{goalId}}/progress
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "progress": 35,
+  "note": "Completed Security+ study guide — chapter 5"
+}
+
+### Complete a goal (progress = 100)
+PATCH {{baseUrl}}/goals/{{goalId}}/progress
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "progress": 100,
+  "note": "Goal achieved!"
+}
+
+### Delete a goal
+DELETE {{baseUrl}}/goals/{{goalId}}
+Authorization: Bearer {{token}}

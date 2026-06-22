@@ -1,0 +1,31 @@
+### Ascend API — Analytics
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+
+### Get dashboard snapshot (cached, refreshed every 5 min)
+GET {{baseUrl}}/analytics/dashboard
+Authorization: Bearer {{token}}
+
+###
+
+### Daily analytics (last 30 days)
+GET {{baseUrl}}/analytics/daily?days=30
+Authorization: Bearer {{token}}
+
+###
+
+### Weekly analytics (last 12 weeks)
+GET {{baseUrl}}/analytics/weekly?weeks=12
+Authorization: Bearer {{token}}
+
+###
+
+### Monthly analytics (last 12 months)
+GET {{baseUrl}}/analytics/monthly?months=12
+Authorization: Bearer {{token}}
+
+###
+
+### Force refresh dashboard snapshot
+POST {{baseUrl}}/analytics/snapshot/refresh
+Authorization: Bearer {{token}}

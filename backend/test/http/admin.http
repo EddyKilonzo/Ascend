@@ -1,0 +1,74 @@
+### Ascend API — Admin Endpoints
+### Requires: admin user JWT in @adminToken
+
+@baseUrl = http://localhost:3000/api/v1
+@adminToken = REPLACE_WITH_ADMIN_JWT
+
+### -----------------------------------------------------------------------
+### List all users (paginated)
+### -----------------------------------------------------------------------
+GET {{baseUrl}}/admin/users?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+###
+
+### Search users by name or email
+GET {{baseUrl}}/admin/users?search=john&page=1&limit=10
+Authorization: Bearer {{adminToken}}
+
+###
+
+### -----------------------------------------------------------------------
+### Change a user's role
+### Body: { "role": "MODERATOR" } | "USER" | "ADMIN"
+### -----------------------------------------------------------------------
+PATCH {{baseUrl}}/admin/users/USER_UUID_HERE/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "role": "MODERATOR"
+}
+
+###
+
+### Promote user to ADMIN
+PATCH {{baseUrl}}/admin/users/USER_UUID_HERE/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "role": "ADMIN"
+}
+
+###
+
+### -----------------------------------------------------------------------
+### Deactivate a user (revokes all sessions)
+### -----------------------------------------------------------------------
+PATCH {{baseUrl}}/admin/users/USER_UUID_HERE/active
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": false
+}
+
+###
+
+### Re-activate a user
+PATCH {{baseUrl}}/admin/users/USER_UUID_HERE/active
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": true
+}
+
+###
+
+### -----------------------------------------------------------------------
+### Platform statistics
+### -----------------------------------------------------------------------
+GET {{baseUrl}}/admin/stats
+Authorization: Bearer {{adminToken}}

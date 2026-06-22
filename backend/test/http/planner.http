@@ -1,0 +1,76 @@
+# ─── Ascend API — Planner Endpoints ──────────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+@token = REPLACE_WITH_ACCESS_TOKEN
+@taskId = REPLACE_WITH_TASK_ID
+
+### Create a simple task
+POST {{baseUrl}}/planner/tasks
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Review auth module implementation",
+  "description": "Check security and error handling",
+  "priority": "HIGH",
+  "scheduledDate": "2025-01-20T00:00:00.000Z",
+  "dueDate": "2025-01-20T00:00:00.000Z"
+}
+
+### Create a time-blocked task
+POST {{baseUrl}}/planner/tasks
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Deep Work: Write unit tests",
+  "priority": "CRITICAL",
+  "scheduledDate": "2025-01-20T00:00:00.000Z",
+  "isTimeBlocked": true,
+  "blockStart": "09:00",
+  "blockEnd": "11:00",
+  "duration": 120
+}
+
+### Get tasks for today
+GET {{baseUrl}}/planner/tasks
+Authorization: Bearer {{token}}
+
+### Get tasks for a specific date
+GET {{baseUrl}}/planner/tasks?date=2025-01-20
+Authorization: Bearer {{token}}
+
+### Get tasks for a range (weekly view)
+GET {{baseUrl}}/planner/tasks/range?startDate=2025-01-13&endDate=2025-01-19
+Authorization: Bearer {{token}}
+
+### Get overdue tasks
+GET {{baseUrl}}/planner/tasks/overdue
+Authorization: Bearer {{token}}
+
+### Get single task
+GET {{baseUrl}}/planner/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+
+### Mark task as done
+PATCH {{baseUrl}}/planner/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "status": "DONE"
+}
+
+### Update task priority
+PATCH {{baseUrl}}/planner/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "priority": "CRITICAL"
+}
+
+### Delete task
+DELETE {{baseUrl}}/planner/tasks/{{taskId}}
+Authorization: Bearer {{token}}

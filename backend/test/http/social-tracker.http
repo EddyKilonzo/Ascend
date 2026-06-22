@@ -1,0 +1,39 @@
+### Ascend API — Social Media Tracker
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+
+### Log social media usage
+POST {{baseUrl}}/social-tracker
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "platform": "INSTAGRAM",
+  "minutes": 45,
+  "loggedDate": "2025-06-20"
+}
+
+###
+
+### Log TikTok usage
+POST {{baseUrl}}/social-tracker
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "platform": "TIKTOK",
+  "minutes": 30,
+  "loggedDate": "2025-06-20"
+}
+
+###
+
+### Get social usage history (last 30 days)
+GET {{baseUrl}}/social-tracker?days=30
+Authorization: Bearer {{token}}
+
+###
+
+### Delete a log entry
+DELETE {{baseUrl}}/social-tracker/LOG_UUID
+Authorization: Bearer {{token}}

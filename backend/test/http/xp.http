@@ -1,0 +1,16 @@
+# ─── Ascend API — XP & Level Endpoints ───────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@token = REPLACE_WITH_ACCESS_TOKEN
+
+### Get current level and XP
+GET {{baseUrl}}/xp/level
+Authorization: Bearer {{token}}
+
+### Get XP history
+GET {{baseUrl}}/xp/history
+Authorization: Bearer {{token}}
+
+### Get XP history paginated
+GET {{baseUrl}}/xp/history?page=1&limit=10
+Authorization: Bearer {{token}}

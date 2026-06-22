@@ -1,0 +1,79 @@
+# ─── Ascend API — Habits Endpoints ───────────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+@token = REPLACE_WITH_ACCESS_TOKEN
+@habitId = REPLACE_WITH_HABIT_ID
+
+# ─── Create ───────────────────────────────────────────────────────────────────
+
+### Create a daily habit
+POST {{baseUrl}}/habits
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Morning Run",
+  "description": "Run 5km every morning before 8am",
+  "category": "FITNESS",
+  "frequency": "DAILY",
+  "targetCount": 1,
+  "color": "#428475",
+  "icon": "running",
+  "reminderTime": "06:30"
+}
+
+### Create a weekly habit
+POST {{baseUrl}}/habits
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Deep Work Session",
+  "description": "3 hours of uninterrupted deep work",
+  "category": "CAREER",
+  "frequency": "WEEKLY",
+  "targetCount": 3,
+  "color": "#1A312C"
+}
+
+# ─── Read ─────────────────────────────────────────────────────────────────────
+
+### Get all habits with today completion status
+GET {{baseUrl}}/habits
+Authorization: Bearer {{token}}
+
+### Get single habit
+GET {{baseUrl}}/habits/{{habitId}}
+Authorization: Bearer {{token}}
+
+### Get habit statistics and streak
+GET {{baseUrl}}/habits/{{habitId}}/stats
+Authorization: Bearer {{token}}
+
+# ─── Update ───────────────────────────────────────────────────────────────────
+
+### Update a habit
+PATCH {{baseUrl}}/habits/{{habitId}}
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Morning Run — Updated",
+  "reminderTime": "07:00"
+}
+
+### Archive a habit
+PATCH {{baseUrl}}/habits/{{habitId}}
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "isActive": false
+}
+
+# ─── Delete ───────────────────────────────────────────────────────────────────
+
+### Delete habit (soft delete)
+DELETE {{baseUrl}}/habits/{{habitId}}
+Authorization: Bearer {{token}}

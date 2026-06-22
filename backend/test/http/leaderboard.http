@@ -1,0 +1,25 @@
+### Ascend API — Leaderboard
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+
+### Global XP leaderboard (top 50)
+GET {{baseUrl}}/leaderboard/xp?limit=50
+Authorization: Bearer {{token}}
+
+###
+
+### Weekly XP leaderboard
+GET {{baseUrl}}/leaderboard/weekly?limit=50
+Authorization: Bearer {{token}}
+
+###
+
+### Streak leaderboard
+GET {{baseUrl}}/leaderboard/streaks?limit=50
+Authorization: Bearer {{token}}
+
+###
+
+### My rank in the global leaderboard
+GET {{baseUrl}}/leaderboard/my-rank
+Authorization: Bearer {{token}}

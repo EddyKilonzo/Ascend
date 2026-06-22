@@ -1,0 +1,118 @@
+# ─── Ascend API — Auth Endpoints ──────────────────────────────────────────────
+# Requires: VS Code REST Client extension or JetBrains HTTP Client
+# Usage: Set @token after login, then use in subsequent requests.
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+
+# ─── Register ─────────────────────────────────────────────────────────────────
+
+### Register a new user
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "test@ascend.app",
+  "username": "test_user",
+  "displayName": "Test User",
+  "password": "SecurePass@123",
+  "timezone": "Africa/Nairobi"
+}
+
+# ─── Login ────────────────────────────────────────────────────────────────────
+
+### Login with email and password
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test@ascend.app",
+  "password": "SecurePass@123"
+}
+
+@token = {{login.response.body.data.accessToken}}
+
+# ─── Email Verification ───────────────────────────────────────────────────────
+
+### Verify email (replace TOKEN with value from email)
+POST {{baseUrl}}/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+  "token": "REPLACE_WITH_VERIFICATION_TOKEN"
+}
+
+# ─── Password Reset ───────────────────────────────────────────────────────────
+
+### Request password reset
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "test@ascend.app"
+}
+
+### Reset password (replace TOKEN with value from email)
+POST {{baseUrl}}/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "token": "REPLACE_WITH_RESET_TOKEN",
+  "password": "NewSecurePass@456"
+}
+
+# ─── Token Refresh ────────────────────────────────────────────────────────────
+
+### Refresh access token (uses refresh_token cookie or header)
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+X-Refresh-Token: REPLACE_WITH_REFRESH_TOKEN
+
+# ─── 2FA ──────────────────────────────────────────────────────────────────────
+
+### Setup 2FA — returns secret and QR code
+GET {{baseUrl}}/auth/2fa/setup
+Authorization: Bearer {{token}}
+
+### Enable 2FA after scanning QR code
+POST {{baseUrl}}/auth/2fa/enable
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "123456"
+}
+
+### Disable 2FA
+POST {{baseUrl}}/auth/2fa/disable
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "totpCode": "123456"
+}
+
+# ─── Current User ─────────────────────────────────────────────────────────────
+
+### Get authenticated user
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+# ─── OAuth (open in browser) ──────────────────────────────────────────────────
+
+### Initiate Google OAuth (open in browser)
+# GET {{baseUrl}}/auth/google
+
+### Initiate GitHub OAuth (open in browser)
+# GET {{baseUrl}}/auth/github
+
+# ─── Logout ───────────────────────────────────────────────────────────────────
+
+### Logout current session
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### Logout all sessions
+POST {{baseUrl}}/auth/logout-all
+Authorization: Bearer {{token}}

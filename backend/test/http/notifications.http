@@ -1,0 +1,37 @@
+### Ascend API — Notifications
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+
+### Get notifications (paginated)
+GET {{baseUrl}}/notifications?page=1&limit=20
+Authorization: Bearer {{token}}
+
+###
+
+### Get unread notification count
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{token}}
+
+###
+
+### Get unread notifications only
+GET {{baseUrl}}/notifications?unreadOnly=true
+Authorization: Bearer {{token}}
+
+###
+
+### Mark a single notification as read
+PATCH {{baseUrl}}/notifications/NOTIFICATION_UUID/read
+Authorization: Bearer {{token}}
+
+###
+
+### Mark all notifications as read
+PATCH {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{token}}
+
+###
+
+### Delete a notification
+DELETE {{baseUrl}}/notifications/NOTIFICATION_UUID
+Authorization: Bearer {{token}}

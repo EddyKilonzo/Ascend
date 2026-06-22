@@ -1,0 +1,104 @@
+### Ascend API — File Uploads
+@baseUrl = http://localhost:3000/api/v1
+@token = REPLACE_WITH_JWT
+@goalId = REPLACE_WITH_GOAL_UUID
+@habitId = REPLACE_WITH_HABIT_UUID
+@fileId = REPLACE_WITH_FILE_UUID
+
+# ─── Avatar ──────────────────────────────────────────────────────────────────
+
+### Upload or replace profile avatar (JPEG/PNG/WebP, max 5 MB)
+POST {{baseUrl}}/uploads/avatar
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="avatar.jpg"
+Content-Type: image/jpeg
+
+< ./sample-avatar.jpg
+
+###
+
+# ─── Goal motivation images ─────────────────────────────────────────────────
+
+### Upload a motivation image for a goal (e.g. grade screenshot, vision board)
+POST {{baseUrl}}/uploads/goal/{{goalId}}/image
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="grade_95.jpg"
+Content-Type: image/jpeg
+
+< ./sample-grade.jpg
+
+###
+
+### List all motivation images for a goal
+GET {{baseUrl}}/uploads/goal/{{goalId}}/images
+Authorization: Bearer {{token}}
+
+###
+
+# ─── Habit evidence ─────────────────────────────────────────────────────────
+
+### Upload habit evidence image (workout photo, book page, etc.)
+POST {{baseUrl}}/uploads/habit/{{habitId}}/evidence
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="workout_proof.jpg"
+Content-Type: image/jpeg
+
+< ./sample-proof.jpg
+
+###
+
+### List all evidence images for a habit
+GET {{baseUrl}}/uploads/habit/{{habitId}}/evidence
+Authorization: Bearer {{token}}
+
+###
+
+# ─── General file upload ──────────────────────────────────────────────────────
+
+### Upload a general file (image or PDF)
+POST {{baseUrl}}/uploads/file
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="certificate.pdf"
+Content-Type: application/pdf
+
+< ./sample-certificate.pdf
+
+###
+
+# ─── File listing ─────────────────────────────────────────────────────────────
+
+### List all my uploaded files
+GET {{baseUrl}}/uploads/files
+Authorization: Bearer {{token}}
+
+###
+
+### List only goal motivation files
+GET {{baseUrl}}/uploads/files?context=GOAL_MOTIVATION
+Authorization: Bearer {{token}}
+
+###
+
+### List only habit evidence files
+GET {{baseUrl}}/uploads/files?context=HABIT_EVIDENCE
+Authorization: Bearer {{token}}
+
+###
+
+# ─── File deletion ────────────────────────────────────────────────────────────
+
+### Delete an uploaded file (removes from Cloudinary + DB)
+DELETE {{baseUrl}}/uploads/files/{{fileId}}
+Authorization: Bearer {{token}}

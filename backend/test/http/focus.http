@@ -1,0 +1,55 @@
+# ─── Ascend API — Focus Session Endpoints ────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+@token = REPLACE_WITH_ACCESS_TOKEN
+@sessionId = REPLACE_WITH_SESSION_ID
+
+### Start a Pomodoro session
+# @name startSession
+POST {{baseUrl}}/focus/sessions/start
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "mode": "POMODORO_25",
+  "note": "Working on auth service tests"
+}
+
+@sessionId = {{startSession.response.body.data.id}}
+
+### Start a deep work session
+POST {{baseUrl}}/focus/sessions/start
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "mode": "DEEP_WORK_50",
+  "taskId": "REPLACE_WITH_TASK_ID"
+}
+
+### Complete a session
+PATCH {{baseUrl}}/focus/sessions/{{sessionId}}/complete
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "actualMinutes": 25,
+  "interruptions": 0
+}
+
+### Interrupt (cancel) a session
+PATCH {{baseUrl}}/focus/sessions/{{sessionId}}/interrupt
+Authorization: Bearer {{token}}
+
+### Get session history
+GET {{baseUrl}}/focus/sessions
+Authorization: Bearer {{token}}
+
+### Get session history paginated
+GET {{baseUrl}}/focus/sessions?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### Get focus statistics
+GET {{baseUrl}}/focus/stats
+Authorization: Bearer {{token}}

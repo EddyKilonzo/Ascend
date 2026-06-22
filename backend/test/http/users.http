@@ -1,0 +1,48 @@
+# ─── Ascend API — Users Endpoints ────────────────────────────────────────────
+
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+@token = REPLACE_WITH_ACCESS_TOKEN
+
+# ─── Profile ──────────────────────────────────────────────────────────────────
+
+### Get current user profile
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+
+### Get current user stats
+GET {{baseUrl}}/users/me/stats
+Authorization: Bearer {{token}}
+
+### Update profile
+PATCH {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "displayName": "Updated Name",
+  "bio": "Productivity enthusiast",
+  "timezone": "Africa/Nairobi"
+}
+
+### Change password
+PATCH {{baseUrl}}/users/me/password
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "SecurePass@123",
+  "newPassword": "NewSecurePass@456"
+}
+
+# ─── Public Profile ───────────────────────────────────────────────────────────
+
+### Get public profile by username
+GET {{baseUrl}}/users/profile/test_user
+Authorization: Bearer {{token}}
+
+# ─── Delete Account ───────────────────────────────────────────────────────────
+
+### Delete own account (soft delete)
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
