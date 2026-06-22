@@ -1,0 +1,108 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ascend_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ascend_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ascend_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ascend_secret}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ascend_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_secret} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '$$REDIS_PASSWORD', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ascend_backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ascend_user}:${POSTGRES_PASSWORD:-ascend_secret}@postgres:5432/${POSTGRES_DB:-ascend_db}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_secret}
+    ports:
+      - '${API_PORT:-4000}:4000'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: pnpm dev
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: ascend_frontend
+    restart: unless-stopped
+    env_file: ./frontend/.env.local
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-4000}/api/v1
+    ports:
+      - '${WEB_PORT:-3000}:3000'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    command: pnpm dev
+
+  ml:
+    build:
+      context: ./backend/ml
+      dockerfile: Dockerfile
+    container_name: ascend_ml
+    restart: unless-stopped
+    ports:
+      - '${ML_PORT:-8000}:8000'
+    volumes:
+      - ./backend/ml:/app
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ascend_user}:${POSTGRES_PASSWORD:-ascend_secret}@postgres:5432/${POSTGRES_DB:-ascend_db}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secret}@redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: ascend_network

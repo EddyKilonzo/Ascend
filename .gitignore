@@ -1,0 +1,126 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+.yarn/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+env/
+.venv
+*.egg-info/
+*.egg
+
+# ─── Environment & Secrets ────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+# keep examples committed as documentation
+!.env.example
+!.env.*.example
+
+# Private keys / certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+
+# Service account / credential files
+service-account*.json
+*-credentials.json
+credentials.json
+secrets.json
+gcloud-credentials.json
+
+# ─── Build Outputs ────────────────────────────────────────────────────────────
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ─── Database ─────────────────────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.vscode/*.code-snippets
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Claude Code ──────────────────────────────────────────────────────────────
+.claude/
+
+# ─── Testing & Coverage ───────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+htmlcov/
+.pytest_cache/
+*.lcov
+
+# ─── Build Tools ──────────────────────────────────────────────────────────────
+.turbo/
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# ─── Uploads / Temp ───────────────────────────────────────────────────────────
+uploads/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ─── ML / Data Science ────────────────────────────────────────────────────────
+ml_models/*.pkl
+ml_models/*.joblib
+ml_models/*.h5
+ml_models/*.pt
+ml_models/*.onnx
+datasets/*.csv
+datasets/*.parquet
+notebooks/.ipynb_checkpoints/
+
+# ─── Project planning docs (not source code) ──────────────────────────────────
+ascend.md
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.tgz
+*.zip
+*.gz
+*.tar

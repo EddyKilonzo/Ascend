@@ -1,0 +1,32 @@
+{
+  "name": "ascend",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.12.4",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:api": "turbo dev --filter=api",
+    "dev:web": "turbo dev --filter=web",
+    "dev:ai": "turbo dev --filter=ai-service",
+    "build": "turbo build",
+    "build:api": "turbo build --filter=api",
+    "build:web": "turbo build --filter=web",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
+    "db:migrate": "turbo db:migrate --filter=api",
+    "db:seed": "turbo db:seed --filter=api",
+    "db:generate": "turbo db:generate --filter=api",
+    "db:studio": "pnpm --filter=api db:studio",
+    "clean": "turbo clean && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}
